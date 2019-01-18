@@ -1,0 +1,39 @@
+settings:
+  artifacts-dir: test-results/%Y-%m-%d_%H-%M-%S.%f
+
+execution:
+- executor: robot
+  concurrency: 10
+  hold-for: 30s
+  scenario: 
+    script: tests/test.robot
+- executor: robot
+  concurrency: 10
+  hold-for: 30s
+  scenario: 
+    script: tests/test.robot
+- executor: robot
+  concurrency: 10
+  hold-for: 30s
+  scenario: 
+    script: tests/test.robot
+- executor: robot
+  concurrency: 10
+  hold-for: 30s
+  scenario: 
+    script: tests/test.robot
+- executor: robot
+  concurrency: 10
+  hold-for: 30s
+  scenario: 
+    script: tests/test.robot
+- executor: robot
+  concurrency: 10
+  hold-for: 30s
+  scenario: 
+    script: tests/test.robot
+- executor: robot
+  concurrency: 10
+  hold-for: 30s
+  scenario: 
+    script: tests/test.robot

@@ -1,0 +1,15 @@
+settings:
+  artifacts-dir: test-results/%Y-%m-%d_%H-%M-%S.%f
+
+execution:
+- concurrency: 10
+  hold-for: 30s
+  scenario: localhost-frontpage
+
+scenarios:
+  localhost-frontpage:
+    timeout: 1000ms
+    keepalive: true
+    requests:
+    - http://localhost:3000
+

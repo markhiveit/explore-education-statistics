@@ -24,6 +24,8 @@ Usage: "pipenv run python run_tests.py -i robot"
 -p|--profile : Additionally output python profile information
 AND keyword profile information. Outputs log files to test-results directory.
 Usage: "pipenv run python run_tests.py -p"
+
+--ci : Add arguments needed when running the tests as part of the CI pipeline.
 """
 
 import os
@@ -49,8 +51,8 @@ testUrl = "https://educationstatisticstest.z6.web.core.windows.net"
 stageUrl = "https://educationstatisticsstage.z6.web.core.windows.net"
 prodUrl = "https://educationstatistics.z6.web.core.windows.net"
 
-timeout = 10
-implicit_wait = 10
+ci_timeout = 10
+ci_implicit_wait = 10
 
 # Process arguments
 for i in range(1, len(sys.argv)):
@@ -78,7 +80,7 @@ if happypath:
     arguments += ["--include", "HappyPath"]
 
 if ci:
-  arguments += ["--xunit", "xunit", "-v", "timeout:" + str(timeout), "-v", "implicit_wait:" + str(implicit_wait)]
+  arguments += ["--xunit", "xunit", "-v", "timeout:" + str(ci_timeout), "-v", "implicit_wait:" + str(ci_implicit_wait)]
 
 if headless:
     arguments += ["-v", "headless:1"]
