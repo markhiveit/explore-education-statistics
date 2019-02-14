@@ -18,12 +18,12 @@ export interface PrototypeMapProps {
   Boundaries: FeatureCollection;
   OnFeatureSelect?: any;
   map: (map: PrototypeMap) => void;
-  selectedAuthority?: string;
+  selectedAuthorities: string[];
 }
 
 interface PrototypeMapState {
-  selectedAuthority: string;
-  selectedFeature?: Feature;
+  selectedAuthorities: string[];
+  selectedFeatures: Feature[];
 }
 
 class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
@@ -36,7 +36,7 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
 
   public static defaultProps: Partial<PrototypeMapProps> = {
     OnFeatureSelect: undefined,
-    selectedAuthority: '',
+    selectedAuthorities: [],
   };
 
   private data: FeatureCollection;
@@ -50,8 +50,8 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     if (props.map) props.map(this);
 
     this.state = {
-      selectedAuthority: props.selectedAuthority || '',
-      selectedFeature: undefined,
+      selectedAuthorities: props.selectedAuthorities || [],
+      selectedFeatures: [],
     };
 
     /**
@@ -101,67 +101,64 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     }
   };
 
-  private selectFeature = (feature?: Feature) => {
-    if (this.state.selectedAuthority !== '') {
+  private updateSelectedFeatures(selectedFeatures: Feature[]) {
+    this.state.selectedFeatures.forEach(f => {
       // @ts-ignore
-      const currentSelectedLayer = this.state.selectedFeature.properties.layer;
+      f.properties.layer.getElement().classList.remove(styles.selected);
+    });
 
-      currentSelectedLayer.getElement().classList.remove(styles.selected);
+    selectedFeatures.forEach(f => {
+      // @ts-ignore
+      f.properties.layer.getElement().classList.add(styles.selected);
+    });
+
+    const selectedAuthorities = selectedFeatures.map(f => {
+      // @ts-ignore
+      return f.properties.lad17nm;
+    });
+
+    // TODO: create bounds for all the select elements
+    // this.mapNode.leafletElement.fitBounds(selectedLayer.getBounds(), {
+    // padding: [200, 200],
+    // });
+    // selectedLayer.bringToFront();
+
+    this.setState({
+      selectedAuthorities,
+      selectedFeatures,
+    });
+  }
+
+  private updateFeatures(selectedFeatures: Feature[]) {
+    if (this.OnFeatureSelect) {
+      // @ts-ignore
+      this.OnFeatureSelect(selectedFeatures.map(f => f.properties));
     }
+
+    this.updateSelectedFeatures(selectedFeatures);
+  }
+
+  private toggleFeature = (feature?: Feature) => {
+    let selectedFeatures = [...this.state.selectedFeatures];
 
     // @ts-ignore
     if (feature && feature.properties.selectable) {
-      if (this.OnFeatureSelect && feature && feature.properties) {
-        this.OnFeatureSelect(feature.properties);
+      const idx = selectedFeatures.indexOf(feature);
+
+      if (idx === -1) {
+        selectedFeatures = [...selectedFeatures, feature];
+      } else {
+        selectedFeatures.splice(idx, 1);
       }
-
-      if (feature !== undefined) {
-        // @ts-ignore
-        const selectedLayer = feature.properties.layer;
-
-        selectedLayer.getElement().classList.add(styles.selected);
-
-        this.mapNode.leafletElement.fitBounds(selectedLayer.getBounds(), {
-          padding: [200, 200],
-        });
-        selectedLayer.bringToFront();
-
-        this.setState({
-          // @ts-ignore
-          selectedAuthority: feature.properties.lad17nm,
-          selectedFeature: feature,
-        });
-      }
-    } else {
-      this.OnFeatureSelect(undefined);
-
-      this.setState({
-        selectedAuthority: '',
-        selectedFeature: undefined,
-      });
-
-      this.mapNode.leafletElement.fitBounds(PrototypeMap.DEFAULT_BOUNDS, {
-        padding: [200, 200],
-      });
     }
+    this.updateFeatures(selectedFeatures);
   };
 
   // @ts-ignore
   private click = (e: any) => {
     if (e.sourceTarget.feature) {
-      this.selectFeature(e.sourceTarget.feature);
+      this.toggleFeature(e.sourceTarget.feature);
     }
-  };
-
-  private selectAuthority = (e: ChangeEvent<HTMLSelectElement>) => {
-    const selectedFeatureName = e.currentTarget.value;
-
-    const feature = this.data.features.find(
-      // @ts-ignore
-      f => f.properties.lad17nm === selectedFeatureName,
-    );
-
-    this.selectFeature(feature);
   };
 
   private styleFeature = (f: any) => {
@@ -178,13 +175,16 @@ class PrototypeMap extends Component<PrototypeMapProps, PrototypeMapState> {
     prevState: Readonly<PrototypeMapState>,
     snapshot?: any,
   ): void {
-    if (prevProps.selectedAuthority !== this.props.selectedAuthority) {
-      const feature = this.data.features.find(
+    if (
+      prevProps.selectedAuthorities.join(',') !==
+      this.props.selectedAuthorities.join(',')
+    ) {
+      const features = this.data.features.filter(
         // @ts-ignore
-        f => f.properties.lad17nm === this.props.selectedAuthority,
+        f => this.props.selectedAuthorities.includes(f.properties.lad17nm),
       );
 
-      this.selectFeature(feature);
+      this.updateFeatures(features);
     }
   }
 

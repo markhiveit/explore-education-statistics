@@ -9,7 +9,7 @@ import styles from './PrototypeAbsenceData.module.scss';
 
 interface PrototypeAbsenceDataState {
   absenceData: any[];
-  selectedAuthority: string;
+  selectedAuthority: string[];
 }
 
 interface PrototypeAbsenceDataProps {
@@ -31,7 +31,7 @@ class PrototypeAbsenceData extends Component<
 
     this.state = {
       absenceData: [],
-      selectedAuthority: '',
+      selectedAuthority: [],
     };
 
     this.data = this.generateLegendData(
@@ -108,30 +108,27 @@ class PrototypeAbsenceData extends Component<
     };
   }
 
-  public OnFeatureSelect = (properties: any) => {
-    if (properties) {
-      const currentSelection = this.state.absenceData || [];
+  public OnFeatureSelect = (properties: any[]) => {
+    const absenceData = properties.map(data => ({
+      region: data.lad17nm,
+      ...data.absence,
+    }));
 
-      currentSelection.push({
-        region: properties.lad17nm,
-        ...properties.absence,
-      });
+    this.setState({
+      absenceData,
+    });
 
-      this.setState({
-        absenceData: currentSelection,
-      });
-    } else {
-      /*
-      this.setState({
-        absenceData: undefined,
-        selectedAuthority: '',
-      });
-      */
-    }
+    const selectedAuthority = properties.map(data => data.lad17nm);
+
+    this.setState({
+      selectedAuthority,
+    });
   };
 
   public selectAuthority = (e: any) => {
-    const selectedAuthority = e.currentTarget.value;
+    const selectedAuthority = [...e.currentTarget.selectedOptions].map(
+      (option: HTMLOptionElement) => option.value,
+    );
 
     this.setState({
       selectedAuthority,
@@ -158,9 +155,11 @@ class PrototypeAbsenceData extends Component<
               </label>
               <select
                 id="selectedAuthority"
+                multiple={true}
                 value={this.state.selectedAuthority}
                 onChange={this.selectAuthority}
                 className="govuk-select"
+                style={{ height: '400px' }}
               >
                 <option>Select a local authority</option>
                 {this.data.features
@@ -204,7 +203,7 @@ class PrototypeAbsenceData extends Component<
             Boundaries={Boundaries}
             OnFeatureSelect={this.OnFeatureSelect}
             map={m => this.map(m)}
-            selectedAuthority={this.state.selectedAuthority}
+            selectedAuthorities={this.state.selectedAuthority}
           />
         </div>
 
