@@ -8,7 +8,7 @@ import { Boundaries } from './PrototypeMapBoundaries';
 import styles from './PrototypeAbsenceData.module.scss';
 
 interface PrototypeAbsenceDataState {
-  absenceData?: any;
+  absenceData: any[];
   selectedAuthority: string;
 }
 
@@ -30,7 +30,7 @@ class PrototypeAbsenceData extends Component<
     this.map = props.map;
 
     this.state = {
-      absenceData: undefined,
+      absenceData: [],
       selectedAuthority: '',
     };
 
@@ -110,17 +110,23 @@ class PrototypeAbsenceData extends Component<
 
   public OnFeatureSelect = (properties: any) => {
     if (properties) {
+      const currentSelection = this.state.absenceData || [];
+
+      currentSelection.push({
+        region: properties.lad17nm,
+        ...properties.absence,
+      });
+
       this.setState({
-        absenceData: {
-          values: properties.absence,
-        },
-        selectedAuthority: properties.lad17nm,
+        absenceData: currentSelection,
       });
     } else {
+      /*
       this.setState({
         absenceData: undefined,
         selectedAuthority: '',
       });
+      */
     }
   };
 
@@ -176,57 +182,6 @@ class PrototypeAbsenceData extends Component<
             </div>
           </form>
 
-          {this.state.absenceData ? (
-            <div>
-              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                  Overall absence
-                </h3>
-                <p
-                  className="govuk-heading-xl govuk-!-margin-bottom-2"
-                  aria-label="Overall absence"
-                >
-                  <span> {this.state.absenceData.values.overall}% </span>
-                </p>
-                <Details summary="What is overall absence?">
-                  Overall absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </Details>
-              </div>
-              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                  Authorised absence
-                </h3>
-                <p
-                  className="govuk-heading-xl govuk-!-margin-bottom-2"
-                  aria-label="Authorised absence"
-                >
-                  <span> {this.state.absenceData.values.authorised}% </span>
-                </p>
-                <Details summary="What is authorised absence?">
-                  Authorised absence is the adipisicing elit. Dolorum hic nobis
-                  voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </Details>
-              </div>
-              <div className="dfe-dash-tiles__tile govuk-!-margin-bottom-6">
-                <h3 className="govuk-heading-m dfe-dash-tiles__heading">
-                  Unauthorised absence
-                </h3>
-                <p
-                  className="govuk-heading-xl govuk-!-margin-bottom-2"
-                  aria-label="Unauthorised absence"
-                >
-                  <span> {this.state.absenceData.values.unauthorised}% </span>
-                </p>
-                <Details summary="What is unauthorised absence?">
-                  Unauthorised absence is the adipisicing elit. Dolorum hic
-                  nobis voluptas quidem fugiat enim ipsa reprehenderit nulla.
-                </Details>
-              </div>
-            </div>
-          ) : (
-            <div />
-          )}
           <div className={classNames(styles.legend, styles.hideMobile)}>
             <h3 className="govuk-heading-s">Key to overall absence rate</h3>
             <dl className="govuk-list">
@@ -252,6 +207,27 @@ class PrototypeAbsenceData extends Component<
             selectedAuthority={this.state.selectedAuthority}
           />
         </div>
+
+        <table className="govuk-grid-column-full">
+          <thead>
+            <tr>
+              <th>region</th>
+              <th>Overall Absence</th>
+              <th>Authorised Absence</th>
+              <th>Unauthorised Absence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.absenceData.map(data => (
+              <tr key={data.region}>
+                <td>{data.region}</td>
+                <td>{data.overall}</td>
+                <td>{data.authorised}</td>
+                <td>{data.unauthorised}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   }
