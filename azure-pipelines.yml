@@ -1,13 +1,20 @@
+name: 'Application'
+variables:
+  BuildConfiguration: 'Release'
+  BuildPlatform: 'any cpu'
+  CI: true
+trigger: [ 'master' ]
 jobs:
   - job: 'Backend'
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
-      - task: DotNetCoreCLI@2
-        displayName: Restore
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
         inputs:
-          command: restore
-          projects: '$(Parameters.RestoreBuildProjects)'
+          command: 'restore'
+          #projects: '$(Parameters.RestoreBuildProjects)'
+          projects: '**/GovUk.*/*.csproj'
 
       #  - task: DotNetCoreCLI@2
       #    displayName: Build
@@ -42,19 +49,19 @@ jobs:
       #    inputs:
       #      artifactName: backend
       #      targetPath: '$(Build.ArtifactStagingDirectory)'
-
-  - job: 'Frontend_Test'
-    steps:
-      - script: echo Frontend Test step!
-  - job: 'Frontend_Build_Test'
-    dependsOn: 'Frontend_Test'
-    steps:
-      - script: echo Frontend Build Test step!
-  - job: 'Frontend_Build_Stage'
-    dependsOn: 'Frontend_Test'
-    steps:
-      - script: echo Frontend Build Stage step!
-  - job: 'Frontend_Build_Live'
-    dependsOn: 'Frontend_Test'
-    steps:
-      - script: echo Frontend Build Live step!
+      #
+      #  - job: 'Frontend_Test'
+      #    steps:
+      #      - script: echo Frontend Test step!
+      #  - job: 'Frontend_Build_Test'
+      #    dependsOn: 'Frontend_Test'
+      #    steps:
+      #      - script: echo Frontend Build Test step!
+      #  - job: 'Frontend_Build_Stage'
+      #    dependsOn: 'Frontend_Test'
+      #    steps:
+      #      - script: echo Frontend Build Stage step!
+      #  - job: 'Frontend_Build_Live'
+      #    dependsOn: 'Frontend_Test'
+      #    steps:
+      #      - script: echo Frontend Build Live step!
