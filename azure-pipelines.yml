@@ -79,13 +79,43 @@ jobs:
           customCommand: 'run format:check'
   - job: 'Frontend_Build_Test'
     dependsOn: 'Frontend_Test'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
     steps:
-      - script: echo Frontend Build Test step!
-  - job: 'Frontend_Build_Stage'
-    dependsOn: 'Frontend_Test'
-    steps:
-      - script: echo Frontend Build Stage step!
-  - job: 'Frontend_Build_Live'
-    dependsOn: 'Frontend_Test'
-    steps:
-      - script: echo Frontend Build Live step!
+    - task: 'Npm@1'
+      displayName: 'npm ci'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'ci'
+    - task: 'Npm@1'
+      displayName: 'npm run build:test'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'run build:test'
+    - task: 'ArchiveFiles@2'
+      displayName: 'Archive frontend - test'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/build'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend-test.zip'
+    - task: 'PublishPipelineArtifact@0'
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'frontend-test'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+
+
+
+        #- job: 'Frontend_Build_Stage'
+        #  dependsOn: 'Frontend_Test'
+        #  steps:
+        #    - script: echo Frontend Build Stage step!
+        #- job: 'Frontend_Build_Live'
+        #  dependsOn: 'Frontend_Test'
+        #  steps:
+        #    - script: echo Frontend Build Live step!
