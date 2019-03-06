@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
-import { RouteComponentProps } from 'react-router';
 import { contentApi } from '../../services/api';
 import ThemeList from './components/ThemeList';
-
-interface Props extends RouteComponentProps<{}> {}
 
 interface State {
   items: any[];
 }
 
-class FindStatisticsPage extends Component<Props, State> {
+class FindStatisticsPage extends Component<{}, State> {
   public state = {
     items: [],
   };
@@ -45,7 +42,7 @@ class FindStatisticsPage extends Component<Props, State> {
             and regional statistical data and trends
           </li>
         </ul>
-        <ThemeList items={items} linkIdentifier={this.props.match.url} />
+        <ThemeList items={items} linkIdentifier={''} />
       </>
     );
   }
