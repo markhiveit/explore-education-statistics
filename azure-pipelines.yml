@@ -1,4 +1,6 @@
-queue: Hosted VS2017
-
-steps:
-  - script: echo hello world again!
+jobs:
+  - job: Backend
+    pool:
+      vmImage: Hosted Ubuntu 1604
+    steps:
+      - script: echo Backend step!
