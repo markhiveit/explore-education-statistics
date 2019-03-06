@@ -1,9 +1,9 @@
 jobs:
-  - job: Backend
+  - job: 'Backend'
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
       - script: echo Backend step!
-  - job: Frontend - Test
+  - job: 'Frontend - Test'
     steps:
       - script: echo Frontend Test step!
