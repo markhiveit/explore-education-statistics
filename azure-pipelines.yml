@@ -2,20 +2,30 @@ jobs:
   - job: 'Backend'
     pool:
       vmImage: 'ubuntu-16.04'
+    strategy:
+      parallel: 3
     steps:
       - script: echo Backend step!
   - job: 'Frontend_Test'
+    strategy:
+      parallel: 3
     steps:
       - script: echo Frontend Test step!
   - job: 'Frontend_Build_Test'
+    strategy:
+      parallel: 3
     dependsOn: 'Frontend_Test'
     steps:
       - script: echo Frontend Build Test step!
   - job: 'Frontend_Build_Stage'
+    strategy:
+      parallel: 3
     dependsOn: 'Frontend_Test'
     steps:
       - script: echo Frontend Build Stage step!
   - job: 'Frontend_Build_Live'
+    strategy:
+      parallel: 3
     dependsOn: 'Frontend_Test'
     steps:
       - script: echo Frontend Build Live step!
