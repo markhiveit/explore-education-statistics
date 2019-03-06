@@ -13,8 +13,12 @@ jobs:
         displayName: 'Restore'
         inputs:
           command: 'restore'
-          #projects: '$(Parameters.RestoreBuildProjects)'
-          projects: '**/GovUk.*/*.csproj'
+          projects: '**/GovUk.*/*csproj'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.*/*csproj'
+          arguments: '--configuration $(BuildConfiguration)'
 
       #  - task: DotNetCoreCLI@2
       #    displayName: Build
