@@ -1,5 +1,6 @@
 jobs:
   - job: Backend
-    queue: Hosted VS2017
+    pool:
+      vmImage: 'ubuntu-16.04'
     steps:
       - script: echo Backend step!
