@@ -7,3 +7,15 @@ jobs:
   - job: 'Frontend_Test'
     steps:
       - script: echo Frontend Test step!
+  - job: 'Frontend_Build_Test'
+    dependsOn: 'Frontend_Test'
+    steps:
+      - script: echo Frontend Build Test step!
+  - job: 'Frontend_Build_Stage'
+    dependsOn: 'Frontend_Test'
+    steps:
+      - script: echo Frontend Build Stage step!
+  - job: 'Frontend_Build_Live'
+    dependsOn: 'Frontend_Test'
+    steps:
+      - script: echo Frontend Build Live step!
