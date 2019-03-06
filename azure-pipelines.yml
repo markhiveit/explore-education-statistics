@@ -1,9 +1,9 @@
-#name: 'Application'
 variables:
   BuildConfiguration: 'Release'
-  BuildPlatform: 'any cpu'
-  CI: true
+
 trigger: [ 'master' ]
+pr: [ 'master' ]
+
 jobs:
   - job: 'Backend'
     pool:
@@ -44,6 +44,7 @@ jobs:
         inputs:
           artifactName: 'backend'
           targetPath: '$(Build.ArtifactStagingDirectory)'
+
   - job: 'Frontend_Test'
     pool:
       vmImage: 'ubuntu-16.04'
@@ -77,6 +78,7 @@ jobs:
           workingDir: 'src/explore-education-statistics-frontend'
           verbose: false
           customCommand: 'run format:check'
+
   - job: 'Frontend_Build_Test'
     dependsOn: 'Frontend_Test'
     pool:
@@ -109,13 +111,66 @@ jobs:
         artifactName: 'frontend-test'
         targetPath: '$(Build.ArtifactStagingDirectory)'
 
+  - job: 'Frontend_Build_Stage'
+    dependsOn: 'Frontend_Test'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+    - task: 'Npm@1'
+      displayName: 'npm ci'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'ci'
+    - task: 'Npm@1'
+      displayName: 'npm run build:stage'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'run build:stage'
+    - task: 'ArchiveFiles@2'
+      displayName: 'Archive frontend - stage'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/build'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend-stage.zip'
+    - task: 'PublishPipelineArtifact@0'
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'frontend-stage'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
 
-
-        #- job: 'Frontend_Build_Stage'
-        #  dependsOn: 'Frontend_Test'
-        #  steps:
-        #    - script: echo Frontend Build Stage step!
-        #- job: 'Frontend_Build_Live'
-        #  dependsOn: 'Frontend_Test'
-        #  steps:
-        #    - script: echo Frontend Build Live step!
+  - job: 'Frontend_Build_Live'
+    dependsOn: 'Frontend_Test'
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: 'npm'
+    steps:
+    - task: 'Npm@1'
+      displayName: 'npm ci'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'ci'
+    - task: 'Npm@1'
+      displayName: 'npm run build:live'
+      inputs:
+        command: 'custom'
+        workingDir: 'src/explore-education-statistics-frontend'
+        verbose: false
+        customCommand: 'run build:live'
+    - task: 'ArchiveFiles@2'
+      displayName: 'Archive frontend - live'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/build'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/explore-education-statistics-frontend-live.zip'
+    - task: 'PublishPipelineArtifact@0'
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        artifactName: 'frontend-live'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
